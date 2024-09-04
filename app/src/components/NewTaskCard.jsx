@@ -5,12 +5,9 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import Collapse from '@mui/material/Collapse';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
@@ -19,13 +16,15 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import dayjs from 'dayjs';
 import CloseIcon from '@mui/icons-material/Close';
-export default function NewTaskCard({ onCancel }) {
+import { createTask } from '../api/api'; 
+
+export default function NewTaskCard({ onCancel,onTaskAdded }) {
   const [expanded, setExpanded] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [rank, setRank] = useState('medium');
-  const [status, setStatus] = useState('to-do');
+  const [status, setStatus] = useState('todo');
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -38,10 +37,12 @@ export default function NewTaskCard({ onCancel }) {
   const handleRankChange = (event) => {
     setRank(event.target.value);
   };
-
-  const handleSaveClick = () => {
-    // Implement save logic
-    console.log('Task saved:', { name, description, dueDate, rank, status });
+  // const [newTask, setNewTask] = useState({});
+  const handleSaveClick = async () => {
+    if (window.confirm('Are you sure you want to add this task?')) {
+      const newTask = {name, description, dueDate, rank, status}
+      onTaskAdded(newTask); // Call the delete function passed as a prop
+    }
   };
 
   const rankColor = (rank) => {
@@ -119,8 +120,8 @@ export default function NewTaskCard({ onCancel }) {
           <FormControl fullWidth sx={{ mb: 1 }}>
             <InputLabel>Status</InputLabel>
             <Select value={status} onChange={handleStatusChange}>
-              <MenuItem value="to-do">To-Do</MenuItem>
-              <MenuItem value="in progress">In Progress</MenuItem>
+              <MenuItem value="todo">To-Do</MenuItem>
+              <MenuItem value="in_progress">In Progress</MenuItem>
               <MenuItem value="done">Done</MenuItem>
             </Select>
           </FormControl>

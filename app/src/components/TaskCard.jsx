@@ -19,8 +19,9 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import dayjs from 'dayjs';
 import { useDrag } from 'react-dnd';
+import { deleteTask } from '../api/api';
 
-export default function TaskCard({ task }) {
+export default function TaskCard({ task, onTaskDeleted }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState(task.status);
@@ -59,12 +60,18 @@ export default function TaskCard({ task }) {
     setRank(event.target.value);
   };
 
+  const handleDeleteClick = () => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
+      onTaskDeleted(task.id); // Call the delete function passed as a prop
+    }
+  };
+
   const rankColor = (rank) => {
     switch (rank) {
       case 'high':
         return 'red';
       case 'medium':
-        return 'yellow';
+        return 'orange';
       case 'low':
         return 'green';
       default:
@@ -91,6 +98,18 @@ export default function TaskCard({ task }) {
       setDueDateMessage(`Last ${differenceInDays} day(s)`);
     } else {
       setDueDateMessage(null); // No chip for more than 3 days
+    }
+  };
+  const formatStatus = (status) => {
+    switch (status) {
+      case 'todo':
+        return 'To Do';
+      case 'in_progress':
+        return 'In Progress';
+      case 'done':
+        return 'Done';
+      default:
+        return status;
     }
   };
 
@@ -186,14 +205,14 @@ export default function TaskCard({ task }) {
               <FormControl fullWidth sx={{ mb: 1 }}>
                 <InputLabel>Status</InputLabel>
                 <Select value={status} onChange={handleStatusChange}>
-                  <MenuItem value="to-do">To-Do</MenuItem>
+                  <MenuItem value="to-do">To Do</MenuItem>
                   <MenuItem value="in progress">In Progress</MenuItem>
                   <MenuItem value="done">Done</MenuItem>
                 </Select>
               </FormControl>
             ) : (
               <Typography sx={{ mb: 1.5, color: '#2B1887' }}>
-                Status: {status.toUpperCase()}
+                Status: {formatStatus(status)}
               </Typography>
             )}
             {editing ? null : (
@@ -229,7 +248,7 @@ export default function TaskCard({ task }) {
                 <EditIcon />
               </IconButton>
             )}
-            <IconButton size="small" color="error">
+            <IconButton size="small" color="error" onClick={handleDeleteClick}>
               <DeleteIcon />
             </IconButton>
           </CardActions>

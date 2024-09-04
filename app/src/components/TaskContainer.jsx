@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import TaskCard from './TaskCard';
 import NewTaskCard from './NewTaskCard';
@@ -9,9 +9,43 @@ import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import { useDrop } from 'react-dnd';
+import { deleteTask,getAllTasks,createTask } from '../api/api'; // Adjust import path as necessary
+
 
 export default function TaskContainer({ status, tasks, moveTask, icon: IconComponent }) {
+  const [taskList, setTaskList] = useState(tasks);
+
+  useEffect(() => {
+    setTaskList(tasks); // Update task list when tasks prop changes
+  }, [tasks]);
   const [newTaskVisible, setNewTaskVisible] = useState(false);
+
+  const handleDelete = async (taskId) => {
+    try {
+      await deleteTask(taskId);
+      // Optionally, trigger a callback or state update to refresh tasks
+      if (moveTask) {
+        moveTask(taskId); // Adjust as necessary for your use case
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+  const handleTaskAdded = async (newTask) => {
+    try{
+      await createTask(newTask); 
+
+    } 
+    catch(error) {
+      console.error('Error creating task:', error);
+
+      }
+  
+    setTaskList([...taskList, newTask]); // Update task list with the new task
+    setNewTaskVisible(false); // Hide the new task form
+    window.location.reload();
+
+  };
 
   const [, dropRef] = useDrop({
     accept: 'task',
@@ -28,8 +62,22 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
     setNewTaskVisible(false);
   };
 
-  // Filter tasks based on the status passed in as props
-  const filteredTasks = tasks.filter(task => task.status === status);
+
+  const formatStatus = (status) => {
+    switch (status) {
+      case 'todo':
+        return 'TO DO';
+      case 'in_progress':
+        return 'IN PROGRESS';
+      case 'done':
+        return 'DONE';
+      default:
+        return status;
+    }
+  };
+  const handleTaskDeleted = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
 
   return (
     <Grid item xs={12} md={4} ref={dropRef} >
@@ -40,21 +88,28 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
           padding: 2,
           marginTop: 3,
           boxShadow: 3,
+          minWidth:250,
+          minHeight:300
         }}
       >
         <Box display="flex" alignItems="center" justifyContent="center" sx={{ mb: 1.5 }}>
           <IconComponent fontSize="medium" style={{ color: "#2B1887" }} sx={{ mb: 1, mr: 1 }} />
           <Typography variant="h6" align="center" fontWeight="bold" color="#2B1887" gutterBottom>
-            {status.toUpperCase()}
+            {formatStatus(status)}
           </Typography>
         </Box>
-        {filteredTasks.map(task => (
-          <TaskCard key={task.id} task={task} />
+        {taskList.filter(task => task.status === status).map(task => (
+            <TaskCard
+            key={task.id}
+            task={task}
+            onTaskDeleted={handleDelete} // Pass handleDelete function to TaskCard
+            moveTask={moveTask} // Pass moveTask if needed
+          />
         ))}
         {newTaskVisible && (
-          <NewTaskCard onCancel={handleCancelNewTask} />
+          <NewTaskCard onCancel={handleCancelNewTask} onTaskAdded={handleTaskAdded} />
         )}
-       { status==="to-do" && (<Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+       { status==="todo" && (<Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <Tooltip title="Add New Task" arrow>
             <IconButton
               color="primary"
