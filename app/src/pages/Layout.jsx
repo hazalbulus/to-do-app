@@ -1,8 +1,13 @@
-
-import React from 'react';
+import React, { useState } from 'react';
+import Grid from '@mui/material/Grid';
 import TaskContainer from '../components/TaskContainer'; // Assuming TaskContainer is in the same folder
+import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
+import PendingActionsOutlinedIcon from '@mui/icons-material/PendingActionsOutlined';
+import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 
-const tasks = [
+function Layout() {
+
+  const [tasks, setTasks] = useState([
     { id: 1, name: "Task 1", dueDate: "2024-08-30", rank: "high", description: "Task 1 description", createdDate: "2024-08-26", status: "to-do" },
     { id: 2, name: "Task 2", dueDate: "2024-08-31", rank: "medium", description: "Task 2 description", createdDate: "2024-08-25", status: "in progress" },
     { id: 3, name: "Task 3", dueDate: "2024-09-01", rank: "low", description: "Task 3 description", createdDate: "2024-08-24", status: "done" },
@@ -16,16 +21,51 @@ const tasks = [
     { id: 11, name: "Task 11", dueDate: "2024-08-31", rank: "medium", description: "Task 11 description", createdDate: "2024-08-25", status: "in progress" },
     { id: 12, name: "Task 12", dueDate: "2024-09-01", rank: "low", description: "Task 12 description", createdDate: "2024-08-24", status: "to-do" },
     // Add more tasks as needed
-  ];
+  ])
 
-function Layout() {
+  // Function to move tasks between columns
+  const moveTask = (taskId, newStatus) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, status: newStatus } : task
+      )
+    );
+  };
+  const moveCard = (fromIndex, toIndex) => {
+    const updatedTasks = [...tasks];
+    const [movedTask] = updatedTasks.splice(fromIndex, 1);
+    updatedTasks.splice(toIndex, 0, movedTask);
+    setTasks(updatedTasks);
+  };
+
   return (
-    <div>
-      <TaskContainer tasks={tasks} />
-    </div>
+<Grid
+  container
+  spacing={4}
+  sx={{
+    ml:16
+  }}
+>
+  <TaskContainer
+    status="to-do"
+    tasks={tasks}
+    moveTask={moveTask}
+    icon={ContentPasteOutlinedIcon}
+  />
+  <TaskContainer
+    status="in progress"
+    tasks={tasks}
+    moveTask={moveTask}
+    icon={PendingActionsOutlinedIcon}
+  />
+  <TaskContainer
+    status="done"
+    tasks={tasks}
+    moveTask={moveTask}
+    icon={TaskOutlinedIcon}
+  />
+</Grid>
+
   );
 }
-
 export default Layout;
-
-

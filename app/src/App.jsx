@@ -1,16 +1,14 @@
-import './App.css';
-import React from 'react';
 import Layout from './pages/Layout'
-
+import React from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 function App() {
   return (
-    <div>
+    <DndProvider backend={HTML5Backend}>
       <Layout />
-    </div>
+    </DndProvider>
   );
 }
 
 export default App;
-
-

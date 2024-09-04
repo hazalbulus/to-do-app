@@ -18,6 +18,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import dayjs from 'dayjs';
+import { useDrag } from 'react-dnd';
 
 export default function TaskCard({ task }) {
   const [expanded, setExpanded] = useState(false);
@@ -28,6 +29,12 @@ export default function TaskCard({ task }) {
   const [dueDate, setDueDate] = useState(task.dueDate);
   const [rank, setRank] = useState(task.rank);
   const [dueDateMessage, setDueDateMessage] = useState(null);
+
+
+  const [, dragRef] = useDrag({
+    type: 'task',
+    item: { id: task.id, status: task.status },
+  });
 
   useEffect(() => {
     calculateDueDateMessage();
@@ -89,6 +96,7 @@ export default function TaskCard({ task }) {
 
   return (
     <Box
+      ref={dragRef} 
       sx={{
         minWidth: 300,
         mb: 2,
