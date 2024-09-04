@@ -6,6 +6,7 @@ import NewTaskCard from './NewTaskCard';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import Tooltip from '@mui/material/Tooltip';
 import { useDrop } from 'react-dnd';
@@ -14,7 +15,11 @@ import { deleteTask,getAllTasks,createTask } from '../api/api'; // Adjust import
 
 export default function TaskContainer({ status, tasks, moveTask, icon: IconComponent }) {
   const [taskList, setTaskList] = useState(tasks);
+  const [sortOrder, setSortOrder] = useState('create_date'); 
 
+  const handleSortOrderChange = (event) => {
+    setSortOrder(event.target.value);
+  };
 
   useEffect(() => {
     setTaskList(tasks); // Update task list when tasks prop changes
@@ -24,14 +29,12 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
   const handleDelete = async (taskId) => {
     try {
       await deleteTask(taskId);
-      // Optionally, trigger a callback or state update to refresh tasks
-      if (moveTask) {
-        moveTask(taskId); // Adjust as necessary for your use case
-      }
     } catch (error) {
       console.error('Error deleting task:', error);
     }
+    window.location.reload();
   };
+
   const handleTaskUpdated = (updatedTask) => {
     setTaskList((prevTasks) =>
       prevTasks.map((task) =>
@@ -88,7 +91,17 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
     setTasks(tasks.filter(task => task.id !== taskId));
   };
 
+  // Sort tasks based on the selected order
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (sortOrder === 'created_date') {
+      return new Date(b.createDate) - new Date(a.createDate); // Sort by created date
+    } else if (sortOrder === 'due_date') {
+      return new Date(a.dueDate) - new Date(b.dueDate); // Sort by due date
+    }
+    return 0;
+  });
   return (
+
     <Grid item xs={12} md={4} ref={dropRef} >
       <Box
         sx={{
@@ -107,8 +120,15 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
             {formatStatus(status)}
           </Typography>
         </Box>
-        {taskList.filter(task => task.status === status).map(task => (
-            <TaskCard
+        <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel>Sort By</InputLabel>
+        <Select value={sortOrder} onChange={handleSortOrderChange}>
+          <MenuItem value="create_date">Create Date</MenuItem>
+          <MenuItem value="due_date">Due Date</MenuItem>
+        </Select>
+      </FormControl>
+      {sortedTasks.filter(task => task.status === status).map(task => (            
+          <TaskCard
             key={task.id}
             task={task}
             onTaskUpdated={handleTaskUpdated}

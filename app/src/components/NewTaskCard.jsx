@@ -39,10 +39,9 @@ export default function NewTaskCard({ onCancel,onTaskAdded }) {
   };
   // const [newTask, setNewTask] = useState({});
   const handleSaveClick = async () => {
-    if (window.confirm('Are you sure you want to add this task?')) {
       const newTask = {name, description, dueDate, rank, status}
       onTaskAdded(newTask); // Call the delete function passed as a prop
-    }
+
   };
 
   const rankColor = (rank) => {
