@@ -19,9 +19,9 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import dayjs from 'dayjs';
 import { useDrag } from 'react-dnd';
-import { deleteTask } from '../api/api';
+import { deleteTask, updateTask } from '../api/api';
 
-export default function TaskCard({ task, onTaskDeleted }) {
+export default function TaskCard({ task, onTaskDeleted, onTaskUpdated  }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState(task.status);
@@ -51,6 +51,25 @@ export default function TaskCard({ task, onTaskDeleted }) {
   const handleEditClick = () => {
     setEditing(!editing);
   };
+
+  const handleSaveUpdateClick = async () => {
+    if (editing) {
+      try {
+        const updatedTask = await updateTask(task.id, {
+          name,
+          description,
+          dueDate,
+          rank,
+          status,
+        });
+        onTaskUpdated(updatedTask); // Notify parent component about the update
+      } catch (error) {
+        console.error('Error updating task:', error);
+      }
+    }
+    setEditing(!editing);
+  };
+
 
   const handleStatusChange = (event) => {
     setStatus(event.target.value);
@@ -205,8 +224,8 @@ export default function TaskCard({ task, onTaskDeleted }) {
               <FormControl fullWidth sx={{ mb: 1 }}>
                 <InputLabel>Status</InputLabel>
                 <Select value={status} onChange={handleStatusChange}>
-                  <MenuItem value="to-do">To Do</MenuItem>
-                  <MenuItem value="in progress">In Progress</MenuItem>
+                  <MenuItem value="todo">To Do</MenuItem>
+                  <MenuItem value="in_progress">In Progress</MenuItem>
                   <MenuItem value="done">Done</MenuItem>
                 </Select>
               </FormControl>
@@ -240,7 +259,7 @@ export default function TaskCard({ task, onTaskDeleted }) {
             sx={{ justifyContent: 'flex-end', position: 'absolute', bottom: 8, right: 8 }}
           >
             {editing ? (
-              <IconButton size="small" color="success" onClick={handleEditClick}>
+              <IconButton size="small" color="success" onClick={handleSaveUpdateClick}>
                 <SaveAsIcon />
               </IconButton>
             ) : (

@@ -24,9 +24,6 @@ export const getAllTasks = async () => {
 
 // Create a new task
 export const createTask = async (taskData) => {
-    console.log(taskData);
-
-
   try {
     const response = await axiosInstance.post('/tasks', taskData);
     return response.data;
@@ -37,9 +34,9 @@ export const createTask = async (taskData) => {
 };
 
 // Update a task
-export const updateTask = async (taskData) => {
+export const updateTask = async (id,taskData) => {
   try {
-    const response = await axiosInstance.put('/tasks', taskData);
+    const response = await axiosInstance.put(`/tasks/${id}`, taskData);
     return response.data;
   } catch (error) {
     console.error('Error updating task:', error);

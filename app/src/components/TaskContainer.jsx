@@ -15,6 +15,7 @@ import { deleteTask,getAllTasks,createTask } from '../api/api'; // Adjust import
 export default function TaskContainer({ status, tasks, moveTask, icon: IconComponent }) {
   const [taskList, setTaskList] = useState(tasks);
 
+
   useEffect(() => {
     setTaskList(tasks); // Update task list when tasks prop changes
   }, [tasks]);
@@ -30,6 +31,14 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
     } catch (error) {
       console.error('Error deleting task:', error);
     }
+  };
+  const handleTaskUpdated = (updatedTask) => {
+    setTaskList((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+    window.location.reload();
   };
   const handleTaskAdded = async (newTask) => {
     try{
@@ -102,6 +111,7 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
             <TaskCard
             key={task.id}
             task={task}
+            onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleDelete} // Pass handleDelete function to TaskCard
             moveTask={moveTask} // Pass moveTask if needed
           />
