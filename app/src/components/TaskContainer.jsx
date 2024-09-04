@@ -113,7 +113,7 @@ export default function TaskContainer({ status, tasks, moveTask, icon: IconCompo
             task={task}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleDelete} // Pass handleDelete function to TaskCard
-            moveTask={moveTask} // Pass moveTask if needed
+            moveTask={moveTask} 
           />
         ))}
         {newTaskVisible && (

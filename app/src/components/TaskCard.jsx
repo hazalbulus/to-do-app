@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 import { useDrag } from 'react-dnd';
 import { deleteTask, updateTask } from '../api/api';
 
-export default function TaskCard({ task, onTaskDeleted, onTaskUpdated  }) {
+export default function TaskCard({ task, onTaskDeleted, onTaskUpdated, moveTask  }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState(task.status);

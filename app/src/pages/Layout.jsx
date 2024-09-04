@@ -26,21 +26,29 @@ function Layout() {
 
 
 
-  // Function to move tasks between columns
-  const moveTask = (taskId, newStatus) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
+  const moveTask = async (taskId, newStatus) => {
+    try {
+      // Update the task status in the backend
+      const taskToUpdate = tasks.find((task) => task.id === taskId);
+      if (taskToUpdate) {
+        await updateTask(taskId, {
+          ...taskToUpdate,
+          status: newStatus,
+        });
+      }
+  
+      // Update the task status in the local state
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, status: newStatus } : task
+        )
+      );
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
   };
-
-  const moveCard = (fromIndex, toIndex) => {
-    const updatedTasks = [...tasks];
-    const [movedTask] = updatedTasks.splice(fromIndex, 1);
-    updatedTasks.splice(toIndex, 0, movedTask);
-    setTasks(updatedTasks);
-  };
+  
+  
 
   return (
 <Grid
