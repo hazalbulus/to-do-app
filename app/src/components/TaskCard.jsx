@@ -20,6 +20,8 @@ import Chip from '@mui/material/Chip';
 import dayjs from 'dayjs';
 import { useDrag } from 'react-dnd';
 import { deleteTask, updateTask } from '../api/api';
+import DeleteModal from './DeleteModal'; 
+
 
 export default function TaskCard({ task, onTaskDeleted, onTaskUpdated, moveTask  }) {
   const [expanded, setExpanded] = useState(false);
@@ -30,6 +32,7 @@ export default function TaskCard({ task, onTaskDeleted, onTaskUpdated, moveTask 
   const [dueDate, setDueDate] = useState(task.dueDate);
   const [rank, setRank] = useState(task.rank);
   const [dueDateMessage, setDueDateMessage] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false); 
 
 
   const [, dragRef] = useDrag({
@@ -80,9 +83,14 @@ export default function TaskCard({ task, onTaskDeleted, onTaskUpdated, moveTask 
   };
 
   const handleDeleteClick = () => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      onTaskDeleted(task.id); // Call the delete function passed as a prop
-    }
+    setDeleteModalOpen(true); 
+  };
+  const handleConfirmDelete = () => {
+    onTaskDeleted(task.id); 
+    setDeleteModalOpen(false); 
+  };
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false); // Close the delete modal
   };
 
   const rankColor = (rank) => {
@@ -273,6 +281,11 @@ export default function TaskCard({ task, onTaskDeleted, onTaskUpdated, moveTask 
           </CardActions>
         )}
       </Card>
+      <DeleteModal
+        open={deleteModalOpen}
+        handleClose={handleCloseDeleteModal}
+        handleConfirm={handleConfirmDelete}
+      />
     </Box>
   );
 }
